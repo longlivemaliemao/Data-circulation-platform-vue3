@@ -11,7 +11,10 @@ export const update = async (Username, id, tableData, status, explanation) => {
     return;
   }
 
-  if(row.applicationType !== '签名') {
+
+  
+
+  if(row.applicationType !== '签名' && status !== '平台审核未通过') {
     const applicationData = {
       signer: {
         members: []

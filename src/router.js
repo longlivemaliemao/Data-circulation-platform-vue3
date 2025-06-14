@@ -9,8 +9,8 @@ import Examine1 from '@/components/Examine1.vue'
 import Examine2 from '@/components/Examine2.vue'
 import PIM from '@/components/PIM.vue'
 import File from '@/components/File.vue'
-// const BASE_URL = '/dataflow5/'; // 手动设置 BASE_URL
-const BASE_URL = '/'; // 手动设置 BASE_URL
+const BASE_URL = '/dataflow5/'; // 手动设置 BASE_URL
+//const BASE_URL = '/'; // 手动设置 BASE_URL
 const routes = [
   {
     path: '/',

@@ -4,8 +4,11 @@ import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   plugins: [vue()],
-  // base:'/dataflow5/',
-  base:'/',
+  build:{
+    target: 'es2022'
+  },
+  base:'/dataflow5/',
+  //base:'/',
   define: {
     'global': {}
   },
