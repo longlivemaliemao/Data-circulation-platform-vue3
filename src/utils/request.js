@@ -18,6 +18,12 @@ const request = async (url, options = {}) => {
       ...options.headers,
     };
 
+  // 检查 sessionStorage 中是否存在 JWT，并将其添加到请求头中
+  const jwt = sessionStorage.getItem('authToken');
+  if (jwt) {
+    headers['authToken'] = jwt;
+  }
+
   options.headers = headers;
 
   if (options.body && typeof options.body === 'object' && !(options.body instanceof Blob)) {
