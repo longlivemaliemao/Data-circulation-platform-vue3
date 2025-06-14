@@ -1,0 +1,43 @@
+{
+  "name": "test",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.7.3",
+    "big-integer": "^1.6.52",
+    "bigint-mod-arith": "^3.3.1",
+    "crypto-browserify": "^3.12.0",
+    "crypto-js": "^4.2.0",
+    "element-plus": "^2.7.8",
+    "file-saver": "^2.0.5",
+    "global": "^4.4.0",
+    "jwt-decode": "^4.0.0",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
+    "streamsaver": "^2.0.6",
+    "vue": "^3.4.29",
+    "vue-icons-plus": "^0.1.8",
+    "vue-infinite-scroll": "^2.0.2",
+    "vue-router": "^4.0.13"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.8.0",
+    "@types/node": "^22.1.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.23.0",
+    "prettier": "^3.2.5",
+    "sass": "^1.77.8",
+    "vite": "^5.3.1"
+  }
+}

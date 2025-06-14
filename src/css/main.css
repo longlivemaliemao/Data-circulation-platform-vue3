@@ -1,0 +1,1164 @@
+/* 基础样式 */
+:root {
+    font-size: 14px;
+}
+
+body, html {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.form-content {
+    max-height: 100%;
+    flex: 1;
+    padding: 0.5rem;
+}
+
+.el-container {
+    background-color: #f0f2f5;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+
+}
+
+/* 侧边栏样式 */
+.custom-aside {
+    background: linear-gradient(135deg, #1f2f47, #2b3a56);
+    color: #fff;
+    height: 108.2vh;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.custom-aside.is-collapse {
+    width: 56px !important;
+}
+
+.logo {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid #3a4a5f;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.3s ease;
+}
+
+.custom-menu {
+    background-color: transparent;
+    font-size: 1rem;
+    border-right: none;
+    transition: all 0.3s ease;
+}
+
+.custom-menu:not(.el-menu--collapse) {
+    width: 205px;
+}
+
+.custom-menu .el-menu-item {
+    color: #c0c4cc;
+    padding: 1rem 1.2rem;
+    transition: all 0.3s ease;
+    margin: 0.3rem auto;
+    border-radius: 10px;
+    width: 355px!important;
+}
+
+.custom-menu .el-menu-item:hover {
+    color: #ffd04b;
+    background-color: rgba(255, 208, 75, 0.1);
+    transform: translateX(3px);
+}
+
+.custom-menu .el-menu-item.is-active {
+    background-color: #ffd04b;
+    color: #333;
+    font-weight: 700;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(255, 208, 75, 0.3);
+}
+
+/* 头部样式 */
+.el-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    background-color: #fff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    height: 4rem;
+    z-index: 5;
+    transition: all 0.3s ease;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 图标或按钮间距 */
+}
+
+.el-avatar {
+    cursor: pointer;
+    font-weight: 700;
+    color: #409eff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.el-avatar:hover {
+    color: #ffd04b;
+    transform: scale(1.1);
+}
+
+/* 主内容区样式 */
+.main-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 0.8rem;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+    min-height: 90%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 75px
+}
+
+.main-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.sign {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    color: #333;
+    white-space: nowrap;
+    min-width: 80px;
+}
+
+.el-divider {
+    margin: 1rem 0;
+}
+
+.table-container {
+    flex: 1;
+    overflow: hidden;
+}
+
+.status-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-icon {
+    margin-left: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.status-icon.success {
+    color: #67c23a;
+    margin-left: 8px;
+}
+
+.status-icon.error {
+    color: #f56c6c;
+    margin-left: 8px;
+}
+
+.status-icon.waiting {
+    color: #e6a23c;
+    margin-left: 8px;
+}
+
+.application-content {
+    padding: 0.3rem 0;
+}
+
+.content-date {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.action-btn {
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+}
+
+.pagination {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* 表单选择卡片 */
+.form-select-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 0.8rem;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+    min-height: 93%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 75px;
+    justify-content: center;
+}
+
+.form-select-card-search {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 0.8rem;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+    height: calc(87vh);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+
+}
+
+.form-select-card.mobile-form-card {
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.form-select-card.search.mobile-form-card {
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.form-select-btn {
+    height: 5rem;
+    width: 100%;
+    margin: 0.8rem 0;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center; /* 水平居中文本 */
+    white-space: normal; /* 允许换行 */
+    word-break: break-word; /* 防止长单词撑破容器 */
+}
+
+.form-select-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-text {
+    font-weight: 600;
+}
+
+/* 表单卡片 */
+.form-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 0.8rem;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+    height: calc(87vh);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-card.mobile-form-card {
+    height: auto;
+}
+
+.close-form-btn {
+    position: absolute;
+    color: #409eff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1;
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    right: 20px;
+    top: 10px;
+    font-size: 80px;
+}
+
+.close-form-btn:hover {
+    color: #ffd04b;
+    transform: rotate(90deg);
+}
+
+
+.form-input, .form-textarea, .form-datepicker {
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus, .form-textarea:focus, .form-datepicker:focus {
+    border-color: #ffd04b;
+    box-shadow: 0 0 0 2px rgba(255, 208, 75, 0.2);
+}
+
+.form-textarea {
+    min-height: 10rem;
+}
+
+.form-actions {
+    margin-top: 1.5rem;
+}
+
+.submit-btn, .reset-btn {
+    transition: all 0.3s ease;
+    padding: 0.8rem 1.5rem;
+}
+
+.submit-btn:hover {
+    background-color: #ffd04b;
+    border-color: #ffd04b;
+    color: #333;
+    transform: translateY(-2px);
+}
+
+.reset-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 1199px) {
+    :root {
+        font-size: 13px;
+    }
+
+    .el-col-md-16, .el-col-md-8 {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .form-select-card, .form-select-card-search, .form-card {
+        height: auto;
+        margin-bottom: 1rem;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    :root {
+        font-size: 12px;
+    }
+
+    .el-header {
+        padding: 0 1rem;
+        height: 3.5rem;
+    }
+
+    .main-card {
+        padding: 1rem;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    :root {
+        font-size: 12px;
+    }
+    .custom-aside {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+
+    }
+    .custom-aside.is-collapse {
+        width: 0 !important;
+    }
+
+    .el-header {
+        padding: 0 0.8rem;
+        height: 3.2rem;
+    }
+
+
+    .main-card, .form-select-card, .form-select-card-search, .form-card {
+        border-radius: 0.6rem;
+        padding: 0.8rem;
+
+    }
+
+    .form-select-btn {
+        height: 4rem;
+        margin: 0.5rem 0;
+    }
+
+    .btn-icon {
+        font-size: 1.2rem;
+    }
+
+
+}
+
+@media screen and (max-width: 575px) {
+    :root {
+        font-size: 11px;
+    }
+
+    .el-header {
+        padding: 0 0.5rem;
+        height: 3rem;
+    }
+
+    .el-table {
+        font-size: 0.9rem;
+        white-space: nowrap;
+        min-width: 80px;
+    }
+
+    .form-content {
+        padding: 0.2rem;
+    }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+    animation-fill-mode: both;
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.4s ease forwards;
+    animation-fill-mode: both;
+}
+
+/* 高分辨率适配 */
+@media (min-resolution: 2dppx) {
+    :root {
+        font-size: 115%;
+    }
+}
+
+@media (min-resolution: 3dppx) {
+    :root {
+        font-size: 125%;
+    }
+}
+
+/* 全局对话框样式 */
+.detail-dialog {
+    width: 30%;
+    border-radius: 12px !important;
+    animation: fadeIn 0.3s ease;
+}
+
+.detail-dialog .el-dialog__header {
+    border-bottom: 1px solid #eee;
+    padding: 15px 20px;
+}
+
+.detail-dialog .el-dialog__body {
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.detail-dialog .el-dialog__footer {
+    border-top: 1px solid #eee;
+    padding: 15px 20px;
+}
+
+/* 加载动画 */
+.el-loading-spinner .path {
+    stroke: #ffd04b !important;
+    stroke-width: 4 !important;
+}
+
+/* 表格悬停效果 */
+.el-table--enable-row-hover .el-table__body tr:hover>td {
+    background-color: #f5f7fa !important;
+    transition: all 0.2s ease;
+}
+
+/* 按钮悬停效果 */
+.el-button--primary:not(.is-disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+/* 卡片悬停效果 */
+.el-card:hover {
+    transform: translateY(-3px);
+    transition: all 0.3s ease;
+}
+
+/* 侧边栏头部样式 */
+.sidebar-header {
+    position: relative;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #3a4a5f;
+    padding: 0 15px;
+}
+
+/* 固定位置的折叠按钮 */
+.fixed-collapse-btn {
+    position: absolute;
+    right:15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.fixed-collapse-btn:hover {
+    background-color: rgba(255, 208, 75, 0.2);
+    color: #ffd04b;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* logo文字样式 */
+.logo-text {
+    font-size: 18px;
+    color: #fff;
+    transition: all 0.3s ease;
+    font-weight: 700;
+    text-align: center;
+    padding: 20px 0;
+    letter-spacing: 1px
+}
+
+
+/* 侧边栏折叠状态 */
+.custom-aside.is-collapse .sidebar-header {
+    justify-content: flex-start;
+    padding-left: 20px;
+}
+
+/* 过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* 响应式调整 - 保持按钮位置不变 */
+@media screen and (max-width: 768px) {
+    .sidebar-header {
+        height: 50px;
+    }
+
+    .fixed-collapse-btn {
+        right: 8px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .logo-text {
+        font-size: 16px;
+    }
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    background-color: #f5f5f5;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-spacer {
+    flex: 1; /* 撑开中间空白，让右边元素自动贴右 */
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 防止标签文字换行 */
+.label-text {
+    white-space: nowrap;
+    min-width: 80px;
+    font-size: 14px;
+}
+
+/* 调整表单整体布局 */
+.form-content {
+    padding: 0 5px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .label-text {
+        min-width: 70px;
+        font-size: 13px;
+    }
+}
+
+.form-btn-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 垂直居中 */
+    height: 100%;
+}
+
+.btn-sr{
+    display: flex;
+    justify-content: center;
+}
+
+.label-col{
+    font-size:14px;
+    font-weight:700;
+    text-align:right;
+    color:#333
+}
+.input-col
+{
+    padding-left:10px
+}
+
+.form-row
+{
+    margin-top:15px
+}
+
+/* 基本设置 */
+body, html {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 14px; /* 设置基础字体大小，方便整体适配 */
+}
+
+/* 侧边栏 */
+.custom-aside {
+    background: linear-gradient(135deg, #1f2f47, #304156);
+    color: #fff;
+}
+
+.custom-menu {
+    background-color: transparent;
+    font-size: 15px; /* 侧边栏菜单字体大小适中 */
+}
+
+.custom-menu .el-menu-item {
+    color: #c0c4cc;
+    padding: 15px 20px;
+    transition: all 0.3s ease;
+}
+
+.custom-menu .el-menu-item:hover {
+    color: #ffd04b;
+    background-color: rgba(255, 208, 75, 0.1);
+}
+
+.custom-menu .el-menu-item.is-active {
+    background-color: #ffd04b;
+    color: #333;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+/* 顶部栏 */
+.el-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    height: 60px;
+}
+
+.el-avatar {
+    cursor: pointer;
+    font-weight: bold;
+    color: #409eff;
+    font-size: 15px; /* 顶部栏头像文字大小 */
+    transition: color 0.3s ease;
+}
+
+.el-avatar:hover {
+    color: #ffd04b;
+}
+
+/* 内容区 */
+.sign {
+    font-size: 16px; /* 调整内容区标题大小 */
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.el-divider {
+    margin: 15px 0;
+}
+
+/* 卡片 */
+.el-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.el-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.el-table th, .el-table td {
+    font-size: 13px; /* 表格内容字体小而精炼 */
+}
+
+/* 表单 */
+.form-row {
+    margin-top: 15px;
+}
+
+.label-col {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: right;
+    color: #333;
+}
+
+.input-col {
+    padding-left: 10px;
+}
+
+.el-input,
+.el-select {
+    width: 100%;
+    transition: border-color 0.3s ease;
+}
+
+.el-input:focus,
+.el-select:focus {
+    border-color: #ffd04b;
+}
+
+.button-col {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.el-button {
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 上传部分 */
+.el-upload .el-button {
+    margin-right: 10px;
+}
+
+.el-progress {
+    width: 100%;
+    font-size: 13px; /* 调整进度条文字大小 */
+}
+
+/* 分页 */
+.pagination {
+    margin-top: 20px;
+    font-size: 13px; /* 分页文字适配 */
+}
+
+/* 弹出卡片 */
+.el-card .close-btn {
+    font-size: 24px;
+    color: #409eff;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.el-card .close-btn:hover {
+    color: #ffd04b;
+}
+
+.el-button--primary:hover {
+    background-color: #ffd04b;
+    border-color: #ffd04b;
+    color: #333;
+}
+/* 模糊化效果 + 遮罩层 */
+.blur-active .el-container {
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+    pointer-events: none; /* 阻止交互 */
+}
+
+/* 半透明遮罩层（增强聚焦效果） */
+.blur-active::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 999; /* 确保遮罩在内容之上、弹窗之下 */
+}
+
+/* 确保 Element UI 弹窗在遮罩层之上 */
+.el-message-box {
+    z-index: 1000 !important;
+}
+
+.form-card {
+    padding: 20px;
+}
+
+.label-text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+}
+
+.el-textarea__inner {
+    min-height: 100px !important;
+}
+
+/*此处往后为登陆注册css*/
+/*整体框架*/
+.loginish {
+    min-height: 100vh;
+    background-color: #fff;
+    color: #1d2228;
+    display: flex;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.dark-background {
+    background-color:#f0f3f5;
+    height: 100vh;
+}
+
+.desktop-hd {
+    grid-row: 1;
+    height: 60px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    position: relative;
+    background-color: #fff;
+    color: #1d2228;
+    line-height: 84px;
+    padding-left: 50px
+}
+
+.desktop-hd {
+    position: relative;
+    background-color: #fff;
+    color: #1d2228;
+    line-height: 84px;
+    padding-left: 50px
+}
+
+.desktop-hd .desktop-universal-header {
+    float: right;
+    font-size: 13px;
+    margin-right: 50px
+}
+
+.desktop-hd .universal-header-links {
+    margin-left: 16px
+}
+
+.desktop-hd .column {
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: middle;
+    line-height: normal;
+    font-size: 0
+}
+
+.login-box-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.login-box.center {
+    margin: 0 auto;
+    left: 0;
+    right: 0
+}
+
+.login-box {
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #1d2228;
+    box-shadow: 0 0 1px 0 rgba(29,34,40,.1),0 2px 4px 0 rgba(29,34,40,.08);
+    right: 0;
+    min-height: 620px;
+    z-index: 1;
+    padding: 32px 32px;
+    border: 1px solid transparent;
+    border-top: 2px solid #f1f1f5;
+    border-radius: 16px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 420px;
+
+}
+.login-hd {
+    background-color: #fff;
+    color: #1d2228;
+    margin-bottom: 1.41176rem;
+    text-align: center; /* 使所有子元素文本居中 */
+}
+
+.title, .heading, .desc {
+    display: block; /* 确保独占一行 */
+    margin: 0 auto; /* 水平居中 */
+    padding: 0;
+}
+
+
+.title {
+    display: block;
+    margin: 0 auto;
+    max-width: 90vw;
+    padding: 18px 0;
+    text-align: center;
+}
+
+.divider {
+    width: 85%;
+    margin: 10px auto;
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+}
+
+.heading {
+    font-family: 'Arial', sans-serif;
+    display: block !important;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    clear: both;
+}
+
+.desc {
+    font-size: 0.88235rem;
+    letter-spacing: -0.06px;
+    line-height: 1.23529rem;
+    margin-top: 0.35294rem;
+}
+
+.underline-input{
+    border-bottom:30px;
+}
+
+/* 去掉默认边框，只保留下边框 */
+.underline-input :deep(.el-input__wrapper) {
+    box-shadow: none !important; /* 去除默认阴影 */
+    border-radius: 7px !important; /* 去除圆角 */
+    border-bottom: 2px solid #dcdfe6; /* 只显示下边框 */
+    background: transparent !important; /* 透明背景 */
+    padding: 0 !important; /* 调整左侧间距 */
+}
+
+.underline-input :deep(.el-select__wrapper) {
+    box-shadow: none !important; /* 去除默认阴影 */
+    border-radius: 7px !important; /* 去除圆角 */
+    border-bottom: 2px solid #dcdfe6; /* 只显示下边框 */
+    background: transparent !important; /* 透明背景 */
+    padding: 0 !important; /* 调整左侧间距 */
+}
+
+/* 鼠标聚焦时下划线变色 */
+.underline-input :deep(.el-input__wrapper.is-focus) {
+    border-bottom: 1px solid #409eff !important;
+}
+
+/* 鼠标聚焦时下划线变色 */
+.underline-input :deep(.el-select__wrapper.is-focus) {
+    border-bottom: 1px solid #409eff !important;
+}
+
+/* 错误状态：红色下划线 */
+.underline-input :deep(.el-input__wrapper.is-error) {
+    border-bottom: 1px solid #f56c6c !important; /* 红色 */
+}
+
+.underline-input :deep(.el-select__wrapper.is-error) {
+    border-bottom: 1px solid #f56c6c !important; /* 红色 */
+}
+
+
+.center-input{
+    text-align: center;
+}
+
+.center-select ::v-deep(.el-input__inner::placeholder) {
+    text-align: center;
+}
+
+.center-input ::v-deep(.el-select-dropdown__item) {
+    text-align: center;
+}
+
+.center-error ::v-deep(.el-form-item__error) {
+    text-align: center;
+    width: 100%;
+}
+
+.center-error ::v-deep(.el-form-item__error) {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.center-error{
+    position: relative;
+    margin-bottom: 50px;
+}
+
+/* 图标容器（绝对定位在输入框上方） */
+.icon-wrapper {
+    position: absolute;
+    top: -24px; /* 调整图标与输入框的垂直间距 */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+/* 图标样式 */
+.user-icon {
+
+    font-size: 30px;
+    color: #409eff;
+    background: white;
+    padding: 0 8px;
+}
+
+.login-box-container ::v-deep(.el-form-item__content) {
+    align-items: center;
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    font-size: var(--font-size);
+    line-height: 32px;
+    min-width: 0;
+    position: relative;
+    flex-direction: column;
+    align-content: center;
+
+}
+
+.remember-container {
+    display: flex;
+    width: 100%;
+}
+
+.spacer {
+    flex-grow: 1; /* 占据剩余空间 */
+}
+
+.btn-login{
+    width: 96px;
+    border-radius: 20px;
+}
+
+
+.login-bg-outer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    margin: 0;
+    padding: 0;
+    grid-row: 2;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+
+}
+
+.login-bg-inner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* 100% 父容器高度 */
+    background-color: #f0f3f5; /* 你的背景颜色或图片 */
+    background-size: cover; /* 确保背景图片覆盖整个区域 */
+    background-position: center; /* 居中背景 */
+    background-repeat: no-repeat; /* 防止重复 */
+}
+
+.add-tip{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: #666;
+}
+
+.top-link {
+    color: #64B5F6 !important;
+}
