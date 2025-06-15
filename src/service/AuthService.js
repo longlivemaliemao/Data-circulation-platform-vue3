@@ -36,14 +36,14 @@ export async function onRegister(registerData) {
     await initKeyExchange();
   }
 
-  // 发送请求到服务器，检查用户名是否已存在
-  const response = await post('/find-username', { username: registerData.username });
+  // // 发送请求到服务器，检查用户名是否已存在
+  // const response = await post('/find-username', { username: registerData.username });
 
-  // 如果用户名已存在，则停止注册流程
-  if (response.data === "用户名已存在") {
-    ElMessage.error('用户名已存在');
-    return false;
-  }
+  // // 如果用户名已存在，则停止注册流程
+  // if (response.data === "用户名已存在") {
+  //   ElMessage.error('用户名已存在');
+  //   return false;
+  // }
 
   try {
     const sharedKey = await getSharedKey();
