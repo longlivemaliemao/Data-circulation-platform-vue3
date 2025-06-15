@@ -185,33 +185,11 @@ export async function validateToken(token){
 
 export const validateResetCode = async (forgetData) => {
   try {
-
-  // 发送请求到服务器，检查用户名是否已存在
-    const response = await post('/find-username', { username: forgetData.username });
-
-    console.log(response.data);
-
-    // 如果用户名不存在，则停止验证流程
-    if (response.data === "用户名不存在") {
-      ElMessage.error('用户名不存在');
-      return false;
-    }
-    const response1 = await post('/validate', {
-      username:forgetData.username,
-      securityQuestion:forgetData.securityQuestion,
-      securityAnswer:forgetData.securityAnswer,
-    });
-
-    if(response1.data === "验证成功"){
-      //修改密码
-      await initKeyExchange();
-      const sharedKey = await getSharedKey();
-      const Password = await encryptData(sharedKey, stringToArrayBuffer(forgetData.newPassword));
-      const response2 =await post('/update_password', {username:forgetData.username, password:Password});
-      return response2.data;
-    } else {
-      return response1.data;
-    }
+  await initKeyExchange();
+  const sharedKey = await getSharedKey();
+  const Password = await encryptData(sharedKey,stringToArrayBuffer(forgetData.newPassword));
+  const response = await post('/forget_password',{username:forgetData.username, password:Password,securityQuestion:forgetData.securityQuestion,securityAnswer:forgetData.securityAnswer});
+  return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || '');
   }
