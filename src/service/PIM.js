@@ -42,12 +42,16 @@ export const onSubmit = async (form) => {
       ElMessage.success('修改成功');
       const token = response.data;
       sessionStorage.setItem('authToken', token);
+      await window.location.reload(); // 刷新当前页面
+    }
+    else {
+      ElMessage.error(response.message);
     }
   } catch (error) {
     console.error('Error:', error);
     ElMessage.error('修改失败');
   }
-  window.location.reload(); // 刷新当前页面
+  
 }
 function stringToArrayBuffer(str) {
   const encoder = new TextEncoder();
