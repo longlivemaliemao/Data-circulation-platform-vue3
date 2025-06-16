@@ -234,7 +234,7 @@ const ResetCode = async (forgetData) => {
         clearForgetData();
         toLogin();
       } else {
-        ElMessage.error("修改密码失败");
+        ElMessage.error("修改密码失败，" + data);
       }
 
     } else {

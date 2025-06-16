@@ -273,6 +273,7 @@ async function uploadEncryptedChunk(chunk, currentChunk, totalChunks, fileId, fi
       // 上传失败时，记录错误信息
       const errorMsg = response?.message || '未知错误';
       console.error(`分片 ${currentChunk + 1} 上传失败: ${errorMsg}`);
+      ElMessage.error("文件上传失败，" + response?.message);
       throw new Error(`分片 ${currentChunk} 上传失败: ${errorMsg}`);
     }
   } catch (error) {

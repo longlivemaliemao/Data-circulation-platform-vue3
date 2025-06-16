@@ -80,7 +80,7 @@ export async function onRegister(registerData) {
       return true;
     } else {
       // 如果注册失败，输出错误信息
-      ElMessage.error('注册失败');
+      ElMessage.error('注册失败，'+ registerResponse.message);
       console.error('注册失败', registerResponse.message);
       return false;
     }
@@ -189,7 +189,7 @@ export const validateResetCode = async (forgetData) => {
   const sharedKey = await getSharedKey();
   const Password = await encryptData(sharedKey,stringToArrayBuffer(forgetData.newPassword));
   const response = await post('/forget_password',{username:forgetData.username, password:Password,securityQuestion:forgetData.securityQuestion,securityAnswer:forgetData.securityAnswer});
-  return response.data;
+  return response.message;
   } catch (error) {
     throw new Error(error.response?.data?.message || '');
   }
