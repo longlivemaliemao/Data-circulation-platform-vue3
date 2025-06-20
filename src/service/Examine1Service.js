@@ -11,6 +11,11 @@ export const onSubmit = async (formData, id, username) => {
     return;
   }
 
+  if (!formData.authEndTime) {
+    ElMessage.error('请选择授权结束时间');
+    return;
+  }
+
   const Data = {
     id: id,
     status: '申请已通过',

@@ -127,7 +127,7 @@ export const Download = async (row) => {
   try {
     const startTime = Date.now(); // 记录开始时间
     // 发起请求下载文件
-    const response = await get(`/download?fileName=${row.fileName}`, { responseType: 'blob' });
+    const response = await get(`/download?fileName=${row.fileName}&applicationId=${row.id}`, { responseType: 'blob' });
 
     // 创建一个 URL 对象
     const url = window.URL.createObjectURL(response.data);

@@ -135,6 +135,21 @@ const handleResize = () => {
   }
 };
 
+const downloadTooltipContent = (row) => {
+  if (row.explanation === '不允许下载该数据') {
+    return '确权验证失败，无法继续下载该数据';
+  }
+  if (row.authEndTime && new Date(row.authEndTime) < Date.now()) {
+    return '授权已过期，无法下载该数据';
+  }
+  return '';
+};
+
+const isDownloadDisabled = (row) => {
+  if (row.explanation === '不允许下载该数据') return true;
+  if (row.authEndTime && new Date(row.authEndTime) < Date.now()) return true;
+  return false;
+};
 
 </script>
 
@@ -215,11 +230,11 @@ const handleResize = () => {
                           <div class="content-date">时间：{{ scope.row.startDate }} - {{ scope.row.endDate }}</div>
                         </div>
                         <div v-if="scope.row.applicationType === '确权'" class="application-content">
-                          <div class="content-text">需求：对任务ID为 {{ scope.row.text }} ，文件名为“{{ scope.row.fileName }}”的流转数据进行确权</div>
+                          <div class="content-text">需求：对任务ID为 {{ scope.row.text }} ，文件名为"{{ scope.row.fileName }}"的流转数据进行确权</div>
                           <div class="content-date">时间：{{ scope.row.startDate }} - {{ scope.row.endDate }}</div>
                         </div>
                         <div v-if="scope.row.applicationType === '仲裁'" class="application-content">
-                          <div class="content-text">需求：对任务ID为 {{ scope.row.text }} ，文件名为“{{ scope.row.fileName }}”的流转数据进行仲裁</div>
+                          <div class="content-text">需求：对任务ID为 {{ scope.row.text }} ，文件名为"{{ scope.row.fileName }}"的流转数据进行仲裁</div>
                           <div class="content-date">时间：{{ scope.row.startDate }} - {{ scope.row.endDate }}</div>
                         </div>
                       </template>
@@ -228,8 +243,8 @@ const handleResize = () => {
                       <template #default="scope">
 
                         <el-tooltip
-                            :disabled="scope.row.explanation !== '不允许下载该数据'"
-                            content="确权验证失败，无法继续下载该数据"
+                            :disabled="!isDownloadDisabled(scope.row)"
+                            :content="downloadTooltipContent(scope.row)"
                             placement="top"
                         >
                           <el-button
@@ -237,7 +252,7 @@ const handleResize = () => {
                               link
                               type="primary"
                               size="small"
-                              :disabled="scope.row.explanation === '不允许下载该数据'"
+                              :disabled="isDownloadDisabled(scope.row)"
                               @click="Download(scope.row)"
                               class="action-btn"
                           >

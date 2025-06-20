@@ -1,7 +1,6 @@
-
 <!--Examine1.vue-->
 <script setup>
-import { ref, computed, onMounted, h, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, h, onBeforeUnmount, nextTick } from 'vue'
 import {handleCommand, handleSelect} from '@/router.js'
 import {
   onSubmit,
@@ -29,6 +28,7 @@ const formData = ref({
   username:'',
   applicationId:'',
   usagePolicy:'',
+  authEndTime: '', // 授权结束时间字段(重命名)
 });
 
 const files = ref([]);
@@ -216,6 +216,31 @@ const handleResize = () => {
   } else {
     asideWidth.value = '240px';
     isCollapse.value = false;
+  }
+};
+
+const endTimePicker = ref(null);
+const originalEndTime = ref(''); // 保存原始授权结束时间
+
+const onEndPickerVisible = (visible) => {
+  if (visible) {
+    // 记录原始值
+    originalEndTime.value = formData.value.authEndTime;
+    nextTick(() => {
+      // 通过 popper-class 定位到面板
+      const panel = document.querySelector('.custom-end-datepicker');
+      if (!panel) return;
+      const nowBtn = panel.querySelector('.el-picker-panel__link-btn');
+      if (nowBtn) {
+        nowBtn.textContent = '取消';
+        // 防止多次绑定
+        nowBtn.onclick = () => {
+          // 恢复原始值，关闭面板
+          formData.value.authEndTime = originalEndTime.value;
+          endTimePicker.value.handleClose();
+        };
+      }
+    });
   }
 };
 
@@ -411,6 +436,39 @@ const handleResize = () => {
                           <el-col :span="6" class="label-text">授权细则：</el-col>
                           <el-col :span="18" class="input-col">
                             <el-input style="height: 6vh" :rows="2" type="textarea" v-model="formData.usagePolicy"/>
+                          </el-col>
+                        </div>
+                        <!-- 授权结束时间 -->
+                        <div style="display: flex;">
+                          <el-col :span="6" class="label-text">授权结束时间：</el-col>
+                          <el-col :span="18" class="input-col">
+                            <el-date-picker
+                              ref="endTimePicker"
+                              popper-class="custom-end-datepicker"
+                              v-model="formData.authEndTime"
+                              type="datetime"
+                              placeholder="选择授权结束时间"
+                              format="YYYY-MM-DD HH:mm:ss"
+                              value-format="YYYY-MM-DD HH:mm:ss"
+                              :show-now="true"
+                              @visible-change="onEndPickerVisible"
+                              :disabled-date="(time) => time.getTime() < Date.now()"
+                              :disabled-time="(date) => {
+                                if (date.getTime() < Date.now()) {
+                                  return {
+                                    hours: Array.from({ length: 24 }, (_, i) => i),
+                                    minutes: Array.from({ length: 60 }, (_, i) => i),
+                                    seconds: Array.from({ length: 60 }, (_, i) => i)
+                                  }
+                                }
+                                return {
+                                  hours: [],
+                                  minutes: [],
+                                  seconds: []
+                                }
+                              }"
+                              style="width: 100%"
+                            />
                           </el-col>
                         </div>
                         <!-- 参与成员 -->
