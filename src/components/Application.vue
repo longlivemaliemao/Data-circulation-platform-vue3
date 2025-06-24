@@ -5,9 +5,10 @@ import {
   Download,
   fetchApplications,
   fetchDataOwners,
-  onSubmit, onSubmit1
+  onSubmit, onSubmit1,
+  fetchProcessStatus
 } from '@/service/ApplicationService.js'
-import {CircleCheckFilled, CircleCloseFilled, Clock, Expand, Fold} from '@element-plus/icons-vue'
+import {CircleCheckFilled, CircleCloseFilled, Clock, Expand, Fold, Loading, WarningFilled} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useMenu } from '@/service/useMenu.js'
 import { jwtDecode } from 'jwt-decode'
@@ -77,6 +78,81 @@ const paginatedData = computed(() => {
 const dialogVisible = ref(false);
 // 对话框内容
 const dialogContent = ref('');
+
+// 流程状态对话框
+const processDialogVisible = ref(false);
+const processDialogContent = ref([]);
+const processDialogLoading = ref(false);
+
+const getIconForStatus = (status) => {
+  switch (status) {
+    case 'pending':
+      return Clock;
+    case 'in_progress':
+      return Loading;
+    case 'completed':
+      return CircleCheckFilled;
+    case 'stop':
+      return Clock;
+    case 'end':
+      return Clock;
+    case 'error':
+      return WarningFilled;
+    default:
+      return Clock; // 默认为等待图标
+  }
+};
+
+const getIconColor = (status) => {
+  switch (status) {
+    case 'completed':
+      return 'var(--el-color-success)';
+    case 'stop':
+      return 'var(--el-color-info)';
+    case 'in_progress':
+      return 'var(--el-color-primary)';
+    case 'error':
+      return 'var(--el-color-warning)';
+    default:
+      return 'var(--el-color-info)';
+  }
+};
+
+const getContentForActivity = (activity) => {
+  if (!activity || !activity.username || !activity.status || !activity.role) {
+    return '未知状态';
+  }
+  switch (activity.status) {
+    case 'pending':
+      return `${activity.role}${activity.username}等待中`;
+    case 'stop':
+      return `${activity.role}${activity.username}等待中`;
+    case 'in_progress':
+      return `${activity.role}${activity.username}正在处理中...`;
+    case 'completed':
+      return `${activity.role}${activity.username}已处理完成`;
+    case 'error':
+      return `流程在${activity.role}${activity.username}处中断`;
+    default:
+      return `${activity.role}${activity.username}- 状态未知`;
+  }
+};
+
+const openProcessDialog = async (row) => {
+  processDialogVisible.value = true;
+  processDialogLoading.value = true;
+  processDialogContent.value = [];
+  try {
+    const data = await fetchProcessStatus(row.applicationType, row.id);
+    if (data && Array.isArray(data)) {
+      processDialogContent.value = [...data].sort((a, b) => (a.order || 0) - (b.order || 0));
+    }
+  } catch (error) {
+    // The service already shows an error toast.
+  } finally {
+    processDialogLoading.value = false;
+  }
+};
 
 // 打开对话框并显示 explanation 内容
 const openDialog = (explanation) => {
@@ -151,6 +227,15 @@ const isDownloadDisabled = (row) => {
   return false;
 };
 
+const DISABLED_PROCESS_STATUSES = [
+  '等待数据提供方审核',
+  '等待平台审核',
+  '平台审核未通过',
+  '数据提供方审核未通过'
+];
+
+const isProcessDisabled = (row) => DISABLED_PROCESS_STATUSES.includes(row.status);
+
 </script>
 
 <template>
@@ -221,6 +306,16 @@ const isDownloadDisabled = (row) => {
                           <el-icon v-else-if="scope.row.status.includes('已') || scope.row.status.includes('成功') || scope.row.status.includes('完成')" class="status-icon success"><CircleCheckFilled /></el-icon>
                           <el-icon v-else style="margin-left: 8px;"><Clock /></el-icon>
                         </div>
+                        <el-button
+                            link
+                            type="primary"
+                            size="small"
+                            @click="openProcessDialog(scope.row)"
+                            class="action-btn"
+                            :disabled="isProcessDisabled(scope.row)"
+                        >
+                          查看详细流程
+                        </el-button>
                       </template>
                     </el-table-column>
                     <el-table-column  prop="text" label="申请内容" width = "200" >
@@ -293,6 +388,30 @@ const isDownloadDisabled = (row) => {
                   <el-button @click="dialogVisible = false">关闭</el-button>
                 </template>
               </el-dialog>
+              <!-- 流程状态对话框 -->
+              <el-dialog title="详细流程" v-model="processDialogVisible" :width="isMobile ? '90%' : '40%'" custom-class="process-dialog">
+                <div v-loading="processDialogLoading" style="min-height: 200px;">
+                  <el-timeline v-if="processDialogContent.length > 0">
+                    <el-timeline-item
+                        v-for="(activity, index) in processDialogContent"
+                        :key="index"
+                    >
+                      <template #dot>
+                        <div class="tl-dot">
+                          <el-icon :size="20" :color="getIconColor(activity.status)">
+                            <component :is="getIconForStatus(activity.status)" :class="{ 'is-loading': activity.status === 'in_progress' }" />
+                          </el-icon>
+                        </div>
+                      </template>
+                      {{ getContentForActivity(activity) }}
+                    </el-timeline-item>
+                  </el-timeline>
+                  <el-empty v-else description="暂无流程信息" />
+                </div>
+                <template #footer>
+                  <el-button @click="processDialogVisible = false">关闭</el-button>
+                </template>
+              </el-dialog>
             </el-col>
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
               <!-- 按钮卡片，点击按钮后隐藏 -->
@@ -361,7 +480,7 @@ const isDownloadDisabled = (row) => {
 
                     </el-form-item>
                     <el-form-item :rules="{required: true}">
-                      <el-input class="form-textarea" type="textarea" :rows="10" placeholder="说明此次申请具体要求"  v-model="formData.text"/>
+                      <el-input class="form-textarea" type="textarea" :rows="10" placeholder="说明此次申请具体要求，包括申请的数据、数据产生的时间、数据的有效期限等"  v-model="formData.text"/>
                     </el-form-item>
                     <el-form-item :rules="{required: true}">
                       <el-date-picker

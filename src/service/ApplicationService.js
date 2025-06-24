@@ -40,6 +40,22 @@ export async function fetchApplications(username) {
   }
 }
 
+export const fetchProcessStatus = async (applicationType, id) => {
+  try {
+    const response = await post('/application/getProcessStatus', { applicationType, id });
+    if (response.success) {
+      return response.data;
+    } else {
+      ElMessage.error(response.message || '获取流程状态失败');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching process status:', error);
+    ElMessage.error('获取流程状态失败，请稍后重试');
+    throw error;
+  }
+};
+
 export const onSubmit = async (formData, username) => {
 
   // 检查表单内容是否已填写完整

@@ -1162,3 +1162,16 @@ body, html {
 .top-link {
     color: #64B5F6 !important;
 }
+
+.tl-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+}
+
+/* 放大内部图标，但保持外层尺寸 */
+.tl-dot .el-icon {
+  font-size: 18px;
+}
