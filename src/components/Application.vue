@@ -1,5 +1,5 @@
 <script setup>
-import {ref, computed, onMounted, onBeforeUnmount} from 'vue'
+import {ref, computed, onMounted, onBeforeUnmount, watch} from 'vue'
 import {handleCommand, handleSelect} from '@/router.js'
 import {
   Download,
@@ -23,6 +23,44 @@ const selectedForm = ref('');  // 用于跟踪用户选择的表单
 const formSelected = ref(false); // 标记是否选择了表单
 const options = ref([]); // 用于存储从后端获取的用户数据
 const taskId = ref('');
+
+// 新增筛选相关的响应式数据
+const filterType = ref('');
+const filterStatus = ref(''); // <--- 新增：状态筛选模型
+const filterDateRange = ref([]);
+
+// <--- 新增：定义所有状态选项
+// 注意：根据您的描述，第三条规则看起来更像是针对“仲裁”类型，这里我们做此假设
+const allStatusOptions = {
+  '签名': [
+    '等待平台审核',
+    '等待数据提供方审核',
+    '平台审核未通过',
+    '数据提供方审核未通过',
+    '申请已通过',
+    '签名失败'
+  ],
+  '确权': [
+    '等待平台审核',
+    '平台审核未通过',
+    '申请已通过',
+    '确权失败'
+  ],
+  '仲裁': [
+    '等待平台审核',
+    '平台审核未通过',
+    '申请已通过',
+    '第一次验证失败，进行下一步验证',
+    '第二次验证失败，进行下一步验证',
+    '仲裁验证完成'
+  ]
+};
+
+// <--- 新增：根据申请类型动态计算状态选项
+const statusOptions = computed(() => {
+  return allStatusOptions[filterType.value] || [];
+});
+
 
 // 分页相关数据
 let tableData = ref([]);
@@ -63,16 +101,54 @@ onMounted(async () => {
   }
 });
 
+const filteredData = computed(() => {
+  let data = tableData.value;
+
+  // 1. 按申请类型筛选
+  if (filterType.value) {
+    data = data.filter(item => item.applicationType === filterType.value);
+  }
+
+  // <--- 新增：2. 按状态筛选
+  if (filterStatus.value) {
+    data = data.filter(item => item.status === filterStatus.value);
+  }
+
+  // 3. 按申请时间范围筛选
+  if (filterDateRange.value && filterDateRange.value.length === 2) {
+    const [startTime, endTime] = filterDateRange.value;
+    if (startTime && endTime) {
+      const start = new Date(startTime).getTime();
+      const end = new Date(endTime).getTime();
+      data = data.filter(item => {
+        if (!item.applicationTime) return false;
+        const itemTime = new Date(item.applicationTime).getTime();
+        return itemTime >= start && itemTime <= end;
+      });
+    }
+  }
+
+  return data;
+});
+
 const paginatedData = computed(() => {
   if (loading.value) {
     return [];  // 如果还在加载中，返回空数组
   }
   const start = (currentPage.value - 1) * pageSize.value;
   const end = start + pageSize.value;
-  return tableData.value.slice(start, end);
+  return filteredData.value.slice(start, end);
 });
 
+// <--- 修改：监听筛选条件变化，重置到第一页 (加入 filterStatus)
+watch([filterType, filterDateRange, filterStatus], () => {
+  currentPage.value = 1;
+});
 
+// <--- 新增：监听申请类型变化，重置状态筛选器
+watch(filterType, () => {
+  filterStatus.value = '';
+});
 
 // 对话框显示控制
 const dialogVisible = ref(false);
@@ -293,6 +369,47 @@ const isProcessDisabled = (row) => DISABLED_PROCESS_STATUSES.includes(row.status
             <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
               <el-card class="main-card">
                 <div class="sign">申请记录</div>
+                <!-- v--- 修改此处的布局和内容 ---v -->
+                <el-row :gutter="20" style="margin-top: 1rem; align-items: center;">
+                  <el-col :span="6">
+                    <el-select v-model="filterType" placeholder="按申请类型筛选" clearable style="width: 100%;">
+                      <el-option label="签名" value="签名" />
+                      <el-option label="确权" value="确权" />
+                      <el-option label="仲裁" value="仲裁" />
+                    </el-select>
+                  </el-col>
+                  <!-- 新增的状态筛选框 -->
+                  <el-col :span="6">
+                    <el-select
+                        v-model="filterStatus"
+                        placeholder="按状态筛选"
+                        clearable
+                        style="width: 100%;"
+                        :disabled="!filterType"
+                    >
+                      <el-option
+                          v-for="status in statusOptions"
+                          :key="status"
+                          :label="status"
+                          :value="status"
+                      />
+                    </el-select>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-date-picker
+                        v-model="filterDateRange"
+                        type="datetimerange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        format="YYYY-MM-DD HH:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                        style="width: 100%;"
+                        clearable
+                    />
+                  </el-col>
+                </el-row>
+                <!-- ^--- 修改此处的布局和内容 ---^ -->
                 <el-divider />
                 <div class="table-container">
                   <el-table height="66vh" :data="paginatedData" border style="width: 100%" :header-cell-style="{'text-align': 'center'}">
@@ -322,15 +439,15 @@ const isProcessDisabled = (row) => DISABLED_PROCESS_STATUSES.includes(row.status
                       <template #default="scope">
                         <div v-if="scope.row.applicationType === '签名'" class="application-content">
                           <div class="content-text">需求：{{ scope.row.text }}</div>
-                          <div class="content-date">时间：{{ scope.row.startDate }} - {{ scope.row.endDate }}</div>
+                          <div class="content-date">授权结束时间：{{ scope.row.authEndTime || '未知' }}</div>
                         </div>
                         <div v-if="scope.row.applicationType === '确权'" class="application-content">
                           <div class="content-text">需求：对任务ID为 {{ scope.row.text }} ，文件名为"{{ scope.row.fileName }}"的流转数据进行确权</div>
-                          <div class="content-date">时间：{{ scope.row.startDate }} - {{ scope.row.endDate }}</div>
+                          <div class="content-date">授权结束时间：{{ scope.row.authEndTime || '未知' }}</div>
                         </div>
                         <div v-if="scope.row.applicationType === '仲裁'" class="application-content">
                           <div class="content-text">需求：对任务ID为 {{ scope.row.text }} ，文件名为"{{ scope.row.fileName }}"的流转数据进行仲裁</div>
-                          <div class="content-date">时间：{{ scope.row.startDate }} - {{ scope.row.endDate }}</div>
+                          <div class="content-date">授权结束时间：{{ scope.row.authEndTime || '未知' }}</div>
                         </div>
                       </template>
                     </el-table-column>
@@ -375,7 +492,7 @@ const isProcessDisabled = (row) => DISABLED_PROCESS_STATUSES.includes(row.status
                 <el-pagination
                     background
                     layout="prev, pager, next"
-                    :total="tableData.length"
+                    :total="filteredData.length"
                     :page-size="pageSize"
                     v-model:currentPage="currentPage"
                     class="pagination"
@@ -481,18 +598,6 @@ const isProcessDisabled = (row) => DISABLED_PROCESS_STATUSES.includes(row.status
                     </el-form-item>
                     <el-form-item :rules="{required: true}">
                       <el-input class="form-textarea" type="textarea" :rows="10" placeholder="说明此次申请具体要求，包括申请的数据、数据产生的时间、数据的有效期限等"  v-model="formData.text"/>
-                    </el-form-item>
-                    <el-form-item :rules="{required: true}">
-                      <el-date-picker
-                          v-model="formData.dateTimeRange"
-                          type="datetimerange"
-                          range-separator="至"
-                          start-placeholder="开始日期"
-                          end-placeholder="结束日期"
-                          format="YYYY-MM-DD HH:mm:ss"
-                          value-format="YYYY-MM-DD HH:mm:ss"
-                          class="form-datepicker"
-                      ></el-date-picker>
                     </el-form-item>
                     <el-divider />
                   </el-form>

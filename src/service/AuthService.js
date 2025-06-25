@@ -189,7 +189,7 @@ export const validateResetCode = async (forgetData) => {
   const sharedKey = await getSharedKey();
   const Password = await encryptData(sharedKey,stringToArrayBuffer(forgetData.newPassword));
   const response = await post('/forget_password',{username:forgetData.username, password:Password,securityQuestion:forgetData.securityQuestion,securityAnswer:forgetData.securityAnswer});
-  return response.message;
+  return response.success ? response.data : response.message;
   } catch (error) {
     throw new Error(error.response?.data?.message || '');
   }

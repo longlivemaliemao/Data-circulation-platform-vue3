@@ -53,7 +53,7 @@ export const onReject = async (explanation, id) => {
   try {
     const Data = {
       id: id,
-      status: '数据所有方审核未通过',
+      status: '数据提供方审核未通过',
       explanation: explanation,
       fileName:'',
     };

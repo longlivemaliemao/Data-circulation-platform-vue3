@@ -83,10 +83,10 @@ const validateUsername = (rule, value, callback) => {
 };
 const rules = ref({
   username: [
-    { required: true, validator: validateUsername, trigger: 'blur' }
+    { validator: validateUsername, trigger: 'blur' }
   ],
   password: [
-    { required: true, validator: validatePassword, trigger: 'blur' }
+    { validator: validatePassword, trigger: 'blur' }
   ],
 });
 const isCollapse = ref(false); // 侧边栏折叠状态

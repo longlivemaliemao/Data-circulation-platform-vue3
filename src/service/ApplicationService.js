@@ -69,18 +69,14 @@ export const onSubmit = async (formData, username) => {
     return;
   }
 
-  if (!formData.dateTimeRange || formData.dateTimeRange.length !== 2) {
-    ElMessage.warning('请选择日期时间范围');
-    return;
-  }
   // 准备要上传的数据
   const applicationData = {
     username: username,
     text: formData.text,
     dataUser:formData.dataUser,
     explanation:'',
-    startDate: formData.dateTimeRange ? formData.dateTimeRange[0] : null,
-    endDate: formData.dateTimeRange ? formData.dateTimeRange[1] : null,
+    startDate: '',
+    endDate: '',
     applicationType: formData.type,
     status: '等待平台审核'
   };
