@@ -201,17 +201,17 @@ const getContentForActivity = (activity) => {
   }
   switch (activity.status) {
     case 'pending':
-      return `${activity.role}${activity.username}等待中`;
+      return `用户${activity.username}等待中`;
     case 'stop':
-      return `${activity.role}${activity.username}等待中`;
+      return `用户${activity.username}等待中`;
     case 'in_progress':
-      return `${activity.role}${activity.username}正在处理中...`;
+      return `用户${activity.username}正在处理中...`;
     case 'completed':
-      return `${activity.role}${activity.username}已处理完成`;
+      return `用户${activity.username}已处理完成`;
     case 'error':
-      return `流程在${activity.role}${activity.username}处中断`;
+      return `流程在用户${activity.username}处中断`;
     default:
-      return `${activity.role}${activity.username}- 状态未知`;
+      return `用户${activity.username}- 状态未知`;
   }
 };
 
@@ -444,11 +444,9 @@ const isProcessDisabled = (row) => DISABLED_PROCESS_STATUSES.includes(row.status
                         </div>
                         <div v-if="scope.row.applicationType === '确权'" class="application-content">
                           <div class="content-text">需求：对任务ID为 {{ scope.row.text }} ，文件名为"{{ scope.row.fileName }}"的流转数据进行确权</div>
-                          <div class="content-date">授权结束时间：{{ scope.row.authEndTime || '未知' }}</div>
                         </div>
                         <div v-if="scope.row.applicationType === '仲裁'" class="application-content">
                           <div class="content-text">需求：对任务ID为 {{ scope.row.text }} ，文件名为"{{ scope.row.fileName }}"的流转数据进行仲裁</div>
-                          <div class="content-date">授权结束时间：{{ scope.row.authEndTime || '未知' }}</div>
                         </div>
                       </template>
                     </el-table-column>

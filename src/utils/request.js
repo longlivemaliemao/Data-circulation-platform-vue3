@@ -1,6 +1,6 @@
 import { getSharedKey } from '@/utils/cryptoUtils.js';
 
-const baseURL = '/api';
+const baseURL = '/dataflow/api';
 const sharedKey = await getSharedKey();
 
 // 判断是否需要加密或解密的辅助函数
