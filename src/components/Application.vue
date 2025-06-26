@@ -38,13 +38,15 @@ const allStatusOptions = {
     '平台审核未通过',
     '数据提供方审核未通过',
     '申请已通过',
-    '签名失败'
+    '签名失败',
+    '签名已完成'
   ],
   '确权': [
     '等待平台审核',
     '平台审核未通过',
     '申请已通过',
-    '确权失败'
+    '确权失败',
+    '确权已完成'
   ],
   '仲裁': [
     '等待平台审核',
@@ -169,8 +171,6 @@ const getIconForStatus = (status) => {
     case 'completed':
       return CircleCheckFilled;
     case 'stop':
-      return Clock;
-    case 'end':
       return Clock;
     case 'error':
       return WarningFilled;
