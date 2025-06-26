@@ -12,6 +12,9 @@ export async function fetchTask(userName) {
 
     // 检查响应是否成功
     if (response.success) {
+      if (response.data.length === 0) {
+        ElMessage.success('暂无任务');
+      }
       return response.data;
     } else {
       throw new Error(response.message || 'Failed to fetch Tasks');
