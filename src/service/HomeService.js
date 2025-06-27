@@ -39,12 +39,13 @@ export async function toSavePrivateKey(username) {
     const options = {
       types: [
         {
-          description: 'Text Files',
+          description: 'PEM file',
           accept: {
-            'text/plain': ['.pem'],
+            'application/x-pem-file': ['.pem'],
           },
         },
       ],
+      excludeAcceptAllOption: true,
     };
 
     try {
