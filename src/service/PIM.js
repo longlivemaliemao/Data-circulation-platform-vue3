@@ -6,16 +6,16 @@ import { getSharedKey } from '@/utils/cryptoUtils.js'
 
 export const onSubmit = async (form) => {
 
-  if(form.username !== '') {
-    // 发送请求到服务器，检查用户名是否已存在
-    const response = await post('/find-username', { username: form.username });
+  // if(form.username !== '') {
+  //   // 发送请求到服务器，检查用户名是否已存在
+  //   const response = await post('/find-username', { username: form.username });
 
-    // 如果用户名已存在，则不能修改用户名
-    if (!response.success) {
-      ElMessage.error('用户名已存在');
-      return;
-    }
-  }
+  //   // 如果用户名已存在，则不能修改用户名
+  //   if (!response.success) {
+  //     ElMessage.error('用户名已存在');
+  //     return;
+  //   }
+  // }
   if(form.password !== '')
   {
     const sharedKey = await getSharedKey();

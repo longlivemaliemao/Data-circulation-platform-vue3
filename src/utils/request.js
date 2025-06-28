@@ -1,11 +1,16 @@
 import { getSharedKey } from '@/utils/cryptoUtils.js';
+import { encryptData, decryptData } from '@/service/cryptoWorkerService.js';
 
 const baseURL = '/dataflow/api';
-const sharedKey = await getSharedKey();
 
 // 判断是否需要加密或解密的辅助函数
 const isEncryptionRequired = (url) => {
   return !url.includes('/exchange-keys') && !url.includes('/find-username');
+};
+
+// 判断是否需要对请求体进行签名
+const isSignRequired = (url, method) => {
+  return method === 'POST' && !url.includes('/exchange-keys');
 };
 
 const request = async (url, options = {}) => {
@@ -25,6 +30,53 @@ const request = async (url, options = {}) => {
   }
 
   options.headers = headers;
+
+  // 在签名之前，若 body 为 undefined，则初始化为空对象，方便后续添加字段
+  if (isSignRequired(url, options.method)) {
+    if (!options.body) {
+      options.body = {};
+    }
+
+    const timestamp = Date.now();
+    const sharedKey = await getSharedKey();
+
+    try {
+      // 准备需要签名的数据副本，不能包含 sign 与 timestamp 字段
+      let dataForSign;
+      if (isFormData) {
+        dataForSign = Object.fromEntries(options.body.entries());
+      } else {
+        dataForSign = { ...options.body };
+      }
+      // --- 新增的排序逻辑 ---
+      // 创建一个新的空对象
+      const sortedDataForSign = {};
+      // 获取所有键并按字母顺序排序
+      Object.keys(dataForSign).sort().forEach(key => {
+          // 按排序后的顺序将键值对填充到新对象中
+          sortedDataForSign[key] = dataForSign[key];
+      });
+      // ----------------------
+
+      // 使用排序后的对象进行签名
+      dataForSign = JSON.stringify(sortedDataForSign);
+
+      const payloadUint8 = new TextEncoder().encode(JSON.stringify(dataForSign));
+      const signature = await encryptData(sharedKey, payloadUint8);
+
+      // 将签名与时间戳添加到请求体
+      if (isFormData) {
+        options.body.append('sign', signature);
+        options.body.append('timestamp', timestamp);
+      } else {
+        options.body.sign = signature;
+        options.body.timestamp = timestamp;
+      }
+    } catch (err) {
+      console.error('签名生成失败:', err);
+      throw err;
+    }
+  }
 
   if (options.body && typeof options.body === 'object' && !(options.body instanceof Blob)) {
     const contentType = headers['Content-Type'] || '';
@@ -66,8 +118,9 @@ const request = async (url, options = {}) => {
 
     const apiResponse = await response.json();
 
+    const currentSharedKey = await getSharedKey();
     const decryptedData = isEncryptionRequired(url) && apiResponse.encryptedData
-      ? await decryptData(sharedKey, apiResponse.encryptedData)
+      ? await decryptData(currentSharedKey, apiResponse.encryptedData)
       : apiResponse.data;
 
     const data = typeof decryptedData === 'string' && decryptedData.startsWith('{')
