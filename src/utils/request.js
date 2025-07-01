@@ -41,30 +41,22 @@ const request = async (url, options = {}) => {
     const sharedKey = await getSharedKey();
 
     try {
-      // 准备需要签名的数据副本，不能包含 sign 与 timestamp 字段
+      // 准备需要签名的数据副本，不能包含 sign 字段
       let dataForSign;
       if (isFormData) {
         dataForSign = Object.fromEntries(options.body.entries());
       } else {
         dataForSign = { ...options.body };
       }
-      // --- 新增的排序逻辑 ---
-      // 创建一个新的空对象
-      const sortedDataForSign = {};
-      // 获取所有键并按字母顺序排序
-      Object.keys(dataForSign).sort().forEach(key => {
-          // 按排序后的顺序将键值对填充到新对象中
-          sortedDataForSign[key] = dataForSign[key];
-      });
-      // ----------------------
+      dataForSign.timestamp = timestamp;
 
       // 使用排序后的对象进行签名
-      dataForSign = JSON.stringify(sortedDataForSign);
+      dataForSign = JSON.stringify(dataForSign);
 
-      const payloadUint8 = new TextEncoder().encode(JSON.stringify(dataForSign));
+      const payloadUint8 = new TextEncoder().encode(dataForSign);
       const signature = await encryptData(sharedKey, payloadUint8);
 
-      // 将签名与时间戳添加到请求体
+      // 将签名添加到请求体
       if (isFormData) {
         options.body.append('sign', signature);
         options.body.append('timestamp', timestamp);
