@@ -104,7 +104,7 @@ export async function calculateConfirm(file, Data, username) {
     }
   } catch (error) {
     console.error('calculateConfirm error:', error);
-    messages.push({ type: 'error', message: '计算过程中出错' });
+    messages.push({ type: 'error', message: '计算过程中出错' + error });
   } finally {
     sessionStorage.setItem('reloadMessages', JSON.stringify(messages));
     window.location.reload();
@@ -177,12 +177,14 @@ export async function calculateArbitration(file, Data, username) {
 
 async function TransferTestingTime(username, taskId, executionTime){
 
-  const params = new URLSearchParams();
-  params.append('username', username);
-  params.append('taskId', taskId);
-  params.append('executionTime', executionTime);
+  // 直接使用对象传递参数，方便全局请求拦截器追加签名与时间戳
+  const data = {
+    username,
+    taskId,
+    executionTime,
+  };
 
-  const response = await post('/task/testTime', params.toString(), {
+  const response = await post('/task/testTime', data, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
