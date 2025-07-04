@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount} from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import {handleCommand, handleSelect} from '@/router.js'
 import { fetchDataRecord, searchUsernamesAPI, toSavePrivateKey } from '@/service/HomeService.js'
@@ -27,6 +27,14 @@ const tableData = ref([]);
 const currentPage = ref(1); // 当前页
 const pageSize = ref(7); // 每页显示条数
 
+// 查询条件
+const query = reactive({
+  taskId: '',
+  fileName: '',
+  creatorName: '',
+  dateRange: [] // [beginTimestamp, endTimestamp]
+});
+
 // 详情对话框的可见性和选中的行数据
 const dialogVisible = ref(false);
 const Outline = ref('');
@@ -44,25 +52,20 @@ const formattedTableData = computed(() => {
   });
 });
 
-onMounted(async () => {
-  // tableData.value = await fetchDataRecord(tableData);
-  // 1. 获取原始数据
-  const rawData = await fetchDataRecord();
-
-  // 2. 按时间降序排序（假设时间字段为 `time` 或 `timestamp`）
+// 统一获取并设置数据的函数
+const fetchAndSetData = async (params = {}) => {
+  const rawData = await fetchDataRecord(params);
   if (rawData && rawData.length > 0) {
-    rawData.sort((a, b) => {
-      // 根据实际字段名调整（如 a.createTime, b.date 等）
-      return new Date(b.time) - new Date(a.time); // 从新到旧
-    });
+    rawData.sort((a, b) => new Date(b.time) - new Date(a.time));
   }
+  tableData.value = rawData || [];
+};
 
-  // 3. 赋值给响应式变量（触发视图更新）
-  tableData.value = rawData;
+onMounted(async () => {
+  await fetchAndSetData();
   await savePrivateKey();
   console.log(tableData.value);
 });
-
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -212,6 +215,37 @@ const handleResize = () => {
   }
 };
 
+// 执行查询
+const handleQuery = async () => {
+  // 日期范围校验：必须同时选择或同时不选择
+  if (query.dateRange.length === 1) {
+    ElMessage.warning('请同时选择开始时间和结束时间');
+    return;
+  }
+
+  const params = {};
+  if (query.taskId) params.taskId = query.taskId;
+  if (query.fileName) params.fileName = query.fileName;
+  if (query.creatorName) params.creatorName = query.creatorName;
+  if (query.dateRange && query.dateRange.length === 2) {
+    params.begin = query.dateRange[0];
+    params.end = query.dateRange[1];
+  }
+
+  await fetchAndSetData(params);
+  currentPage.value = 1;
+};
+
+// 重置查询条件
+const handleReset = async () => {
+  query.taskId = '';
+  query.fileName = '';
+  query.creatorName = '';
+  query.dateRange = [];
+  await fetchAndSetData();
+  currentPage.value = 1;
+};
+
 </script>
 
 <template>
@@ -269,6 +303,52 @@ const handleResize = () => {
               <el-card class="main-card">
                 <div class="sign">数据流转记录</div>
                 <el-divider />
+
+                      <!-- 查询条件表单 -->
+                      <el-form :model="query" class="filter-form" style="margin-bottom: 20px;">
+                        <el-row :gutter="20" align="middle">
+                          <el-col :span="7">
+                            <el-form-item label="任务ID">
+                              <el-input v-model="query.taskId" placeholder="任务ID"/>
+                            </el-form-item>
+                          </el-col>
+                          <el-col :span="10">
+                            <el-form-item label="数据名称">
+                              <el-input v-model="query.fileName" placeholder="数据名称"/>
+                            </el-form-item>
+                          </el-col>
+                          <el-col :span="7">
+                            <el-form-item>
+                              <el-button type="primary" @click="handleQuery">查询</el-button>
+                            </el-form-item>
+                          </el-col>
+                        </el-row>
+                        <el-row :gutter="20" align="middle">
+                          <el-col :span="7">
+                            <el-form-item label="数据提供方">
+                              <el-input v-model="query.creatorName" placeholder="数据提供方"/>
+                            </el-form-item>
+                          </el-col>
+                          <el-col :span="10">
+                            <el-form-item label="时间范围">
+                              <el-date-picker
+                                v-model="query.dateRange"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始时间"
+                                end-placeholder="结束时间"
+                                value-format="YYYY-MM-DD HH:mm:ss"
+                                style="width: 100%;"
+                              />
+                            </el-form-item>
+                          </el-col>
+                          <el-col :span="7">
+                            <el-form-item>
+                              <el-button @click="handleReset">重置</el-button>
+                            </el-form-item>
+                          </el-col>
+                        </el-row>
+                      </el-form>
                 <div class="table-container">
                   <el-table height="66vh" :data="formattedTableData" border style="width: 100%" :header-cell-style="{'text-align': 'center'}">
                     <el-table-column prop="time" label="流转时间" align="center" />

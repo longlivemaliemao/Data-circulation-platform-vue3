@@ -7,10 +7,22 @@ import {
   encryptData, // 使用 Web Worker 加密数据的函数
 } from '@/service/cryptoWorkerService.js';
 
-export const fetchDataRecord = async () => {
+export const fetchDataRecord = async (queryParams = {}) => {
   try {
-    
-    const response = await get(`/task/getCompletedData`);
+    // 将查询参数序列化为查询字符串
+    let queryString = '';
+    if (queryParams && Object.keys(queryParams).length > 0) {
+      const paramString = Object.entries(queryParams)
+        .filter(([key, value]) => value !== undefined && value !== null && value !== '')
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
+
+      if (paramString) {
+        queryString = `?${paramString}`;
+      }
+    }
+
+    const response = await get(`/task/getCompletedData${queryString}`);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
