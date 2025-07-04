@@ -19,7 +19,7 @@ let tableData = ref([]);
 const { availableMenus } = useMenu(userRole);
 
 onMounted(async () => {
-  tableData.value = await fetchUser();
+  //tableData.value = await fetchUser();
 });
 
 const formData = ref({
@@ -194,7 +194,7 @@ const handleResize = () => {
                     </el-form-item>
 
                     <el-form-item label="修改新密码：" prop="password">
-                      <el-input v-model="formData.password"/>
+                      <el-input v-model="formData.password" type="password"/>
                     </el-form-item>
                     <el-form-item prop="securityQuestion" label="修改密保问题：">
                       <el-select
