@@ -30,7 +30,7 @@ const filterStatus = ref(''); // <--- 新增：状态筛选模型
 const filterDateRange = ref([]);
 
 // <--- 新增：定义所有状态选项
-// 注意：根据您的描述，第三条规则看起来更像是针对“仲裁”类型，这里我们做此假设
+// 注意：根据您的描述，第三条规则看起来更像是针对"仲裁"类型，这里我们做此假设
 const allStatusOptions = {
   '签名': [
     '等待平台审核',
@@ -222,7 +222,7 @@ const openProcessDialog = async (row) => {
   try {
     const data = await fetchProcessStatus(row.applicationType, row.id);
     if (data && Array.isArray(data)) {
-      processDialogContent.value = [...data].sort((a, b) => (a.order || 0) - (b.order || 0));
+      processDialogContent.value = [...data].sort((a, b) => (a.sort || 0) - (b.sort || 0));
     }
   } catch (error) {
     // The service already shows an error toast.
