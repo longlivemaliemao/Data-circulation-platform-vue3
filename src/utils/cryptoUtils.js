@@ -47,10 +47,8 @@ async function exchangeKeys(publicKey) {
  * @param {CryptoKey} key - 共享密钥
  */
 export async function setSharedKey(key) {
+  // 仅在内存中保存共享密钥，不再写入 sessionStorage
   sharedKey = key;
-  // 将共享密钥导出为 JWK 格式并存储在 sessionStorage 中
-  const jwk = await window.crypto.subtle.exportKey('jwk', key);
-  sessionStorage.setItem('sharedKey', JSON.stringify(jwk));
 }
 
 /**
@@ -58,21 +56,7 @@ export async function setSharedKey(key) {
  * @returns {CryptoKey} - 共享密钥
  */
 export async function getSharedKey() {
-  if (sharedKey) {
-    return sharedKey;
-  }
-
-  const jwk = sessionStorage.getItem('sharedKey');
-  if (jwk) {
-    sharedKey = await window.crypto.subtle.importKey(
-      'jwk',
-      JSON.parse(jwk),
-      { name: 'AES-CTR', length: 256 }, // 使用 AES-CTR
-      true,
-      ['encrypt', 'decrypt']
-    );
-  }
-
+  // 直接返回内存中的共享密钥
   return sharedKey;
 }
 
@@ -83,7 +67,6 @@ export function clearSharedKey() {
   sharedKey = null;
   clientKeyPair = null;
   serverPublicKey = null;
-  sessionStorage.removeItem('sharedKey');
 }
 
 /**
