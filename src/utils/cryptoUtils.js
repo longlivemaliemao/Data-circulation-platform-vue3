@@ -1,5 +1,6 @@
 // 导入所需的加密和请求处理工具函数
 import { post } from '@/utils/request.js'; // 导入用于发送 POST 请求的函数
+import { saveSharedKey, loadSharedKey, deleteSharedKey } from '@/utils/keyStore.js';
 
 // 用于存储共享密钥和密钥对的全局变量
 export let sharedKey = null;
@@ -47,8 +48,9 @@ async function exchangeKeys(publicKey) {
  * @param {CryptoKey} key - 共享密钥
  */
 export async function setSharedKey(key) {
-  // 仅在内存中保存共享密钥，不再写入 sessionStorage
   sharedKey = key;
+  // 持久化到 IndexedDB，CryptoKey 为不可导出对象，安全性更高
+  await saveSharedKey(key);
 }
 
 /**
@@ -56,7 +58,8 @@ export async function setSharedKey(key) {
  * @returns {CryptoKey} - 共享密钥
  */
 export async function getSharedKey() {
-  // 直接返回内存中的共享密钥
+  if (sharedKey) return sharedKey;
+  sharedKey = await loadSharedKey();
   return sharedKey;
 }
 
@@ -67,6 +70,7 @@ export function clearSharedKey() {
   sharedKey = null;
   clientKeyPair = null;
   serverPublicKey = null;
+  deleteSharedKey();
 }
 
 /**
@@ -110,16 +114,11 @@ export async function generateSharedECDHSecret(clientPrivateKey, serverPublicKey
       name: "AES-CTR", // 改为 AES-CTR 模式
       length: 256
     },
-    true,
+    false, // 不可导出，提升安全
     ["encrypt", "decrypt"]
   );
 
-
-  // 导出共享密钥为原始字节形式并输出其十六进制表示
-  const exportedSharedKey = await window.crypto.subtle.exportKey('raw', secretKey);
-  // console.log("Shared Secret (Hex):", Array.from(new Uint8Array(exportedSharedKey)).map(b => b.toString(16).padStart(2, '0')).join(''));
-
-  // 设置并存储共享密钥
+  // 设置并存储共享密钥（不会暴露原始字节）
   await setSharedKey(secretKey);
 }
 
