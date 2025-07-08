@@ -181,7 +181,7 @@ const handleResize = () => {
                             :before-upload="(file) => handleBeforeUpload(file, scope.row)"
                             :show-file-list="true"
                         >
-                          <el-button type="primary" size="small" :disabled="scope.row.status !== 'in_progress' && scope.row.status !== '私钥无效，请重新提交'">
+                          <el-button type="primary" size="small" :disabled="scope.row.status !== 'in_progress' && scope.row.status !== 'invalid_private_key'">
                             添加私钥
                           </el-button>
                         </el-upload>

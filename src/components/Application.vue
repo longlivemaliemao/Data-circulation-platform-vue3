@@ -206,6 +206,8 @@ const getContentForActivity = (activity) => {
       return `用户${activity.username}等待中`;
     case 'in_progress':
       return `用户${activity.username}正在处理中...`;
+    case 'invalid_private_key':
+      return `用户${activity.username}正在处理中...`;      
     case 'completed':
       return `用户${activity.username}已处理完成`;
     case 'error':
