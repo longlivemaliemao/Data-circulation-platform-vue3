@@ -12,7 +12,7 @@ import {
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { useMenu } from '@/service/useMenu.js'
 import { jwtDecode } from 'jwt-decode'
-import {Expand, Fold} from "@element-plus/icons-vue";
+import {Expand, Fold, Document, Close} from "@element-plus/icons-vue";
 const activeMenu = ref('4');
 const token = sessionStorage.getItem('authToken');
 const decoded = jwtDecode(token);  // 解析 JWT Token
@@ -89,6 +89,15 @@ const showUpload = ref(false);
 
 // 存储选择的文件
 const selectedFile = ref(null);
+const selectedFileName = computed(() => selectedFile.value ? selectedFile.value.name : '');
+
+// 取消已选择文件
+const cancelSelectedFile = () => {
+  selectedFile.value = null;
+  showUpload.value = false;
+  progress.value = 0;
+  isProcessing.value = false;
+};
 
 
 // 文件选择
@@ -117,24 +126,40 @@ const estimatedTime = ref(''); // 用于存储预计剩余时间
 
 // 加密和上传文件
 const encryptAndUpload = async () => {
-
   if (!fileName.value) {
     ElMessage.error("还未给数据命名");
     return;
   }
-  isProcessing.value = true; // 显示进度条
-  const startTime = Date.now(); // 记录开始时间
+  isProcessing.value = true;
+  const startTime = Date.now();
   await encryptCsvFileWithProgress(
     selectedFile.value,
     startTime,
-    isProcessing.value,
-    showUpload.value,
-    estimatedTime,
-    progress,
+    (update) => { // onProgress
+      progress.value = update.progress;
+      estimatedTime.value = update.estimatedTime;
+    },
+    () => { // onComplete
+      progress.value = 100;
+      estimatedTime.value = '0分0秒';
+      isProcessing.value = false;
+      showUpload.value = false;
+      cancelSelectedFile(); // <-- 新增：调用取消文件函数
+      ElMessage.success('文件上传成功');
+    },
+    (err) => { // onError
+      isProcessing.value = false;
+      ElMessage.error(`上传失败: ${err.message}`);
+    },
     fileName.value,
     username,
-    fileOutline.value,
+    fileOutline.value
   );
+};
+
+const stopUpload = () => {
+  stopEncryptionAndUpload();
+  isProcessing.value = false;
 };
 
 // 提示
@@ -369,21 +394,27 @@ const onEndPickerVisible = (visible) => {
 
                 <!-- File upload section with proper spacing -->
                 <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                  <!-- Selected file name -->
+                  <div v-if="selectedFileName" style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                    <el-icon size="18"><Document /></el-icon>
+                    <span>{{ selectedFileName }}</span>
+                    <el-icon size="18" style="cursor:pointer;" @click="cancelSelectedFile"><Close /></el-icon>
+                  </div>
+
                   <!-- File selection and upload buttons -->
                   <div style="display: flex; justify-content: center; gap: 20px; width: 100%;">
                     <el-upload
                         :before-upload="handleBeforeUpload"
-                        :show-file-list="true"
+                        :show-file-list="false"
                     >
                       <el-button type="primary">选择数据文件</el-button>
                     </el-upload>
 
-                    <el-button
-                        v-if="showUpload"
-                        type="success"
-                        @click="encryptAndUpload"
-                    >
+                    <el-button v-if="showUpload && !isProcessing" type="success" @click="encryptAndUpload">
                       加密并且上传
+                    </el-button>
+                    <el-button v-if="isProcessing" type="danger" @click="stopUpload">
+                      停止上传
                     </el-button>
                   </div>
 

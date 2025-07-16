@@ -5,6 +5,18 @@ import { ElMessage } from 'element-plus';
 import { getSharedKey } from '@/utils/cryptoUtils.js';
 import { encryptFile } from '@/service/cryptoWorkerService.js';
 
+let worker = null;
+
+export function stopEncryptionAndUpload(silent = false) {
+  if (worker) {
+    worker.terminate();
+    worker = null;
+    if (!silent) {
+      ElMessage.info('上传已停止');
+    }
+  }
+}
+
 export const onSubmit = async (formData, id, username) => {
   if (formData.signer.members.length < 3) {
     ElMessage.error('联合签名成员最少添加三人');
@@ -158,38 +170,38 @@ const getFileId = async () => {
 export const encryptCsvFileWithProgress = async (
   file,
   startTime,
-  isProcessing,
-  showUpload,
-  estimatedTime,  // Vue ref，string
-  progress,       // Vue ref，number
+  onProgress,
+  onComplete,
+  onError,
   fileName,
   creator_name,
   fileOutline
 ) => {
+  if (worker) {
+    worker.terminate();
+  }
   const subsequentChunkSize = 1024 * 1024;
   const FileId = await getFileId();
 
   try {
     const sharedSecret = await getSharedKey();
-    const worker = new Worker(new URL('@/utils/cryptoWorker.js', import.meta.url));
+    worker = new Worker(new URL('@/utils/cryptoWorker.js', import.meta.url));
 
     const uploadQueue = new Map();
     let nextExpectedChunk = 0;
 
     worker.onmessage = async (e) => {
-      const { type, chunkWithLength, currentChunk, totalChunks, progress: progressValue } = e.data;
+      const { type, chunkWithLength, currentChunk, totalChunks } = e.data;
 
       if (type === 'encryptedChunk') {
-        // 加入队列
-        uploadQueue.set(currentChunk, { chunkWithLength, progressValue });
+        uploadQueue.set(currentChunk, { chunkWithLength });
 
-        // 按顺序上传
         while (uploadQueue.has(nextExpectedChunk)) {
-          const { chunkWithLength: chunk, progressValue } = uploadQueue.get(nextExpectedChunk);
+          const { chunkWithLength: chunk } = uploadQueue.get(nextExpectedChunk);
           uploadQueue.delete(nextExpectedChunk);
 
           try {
-            await uploadEncryptedChunk(
+            const response = await uploadEncryptedChunk(
               chunk.slice(0),
               nextExpectedChunk,
               totalChunks,
@@ -199,11 +211,7 @@ export const encryptCsvFileWithProgress = async (
               fileOutline
             );
 
-            // 更新进度条
             const percent = ((nextExpectedChunk + 1) / totalChunks) * 100;
-            progress.value = Number(percent.toFixed(2));
-
-            // 时间估算
             const now = Date.now();
             const elapsedSec = (now - startTime) / 1000;
             const avgPerChunk = elapsedSec / (nextExpectedChunk + 1);
@@ -211,24 +219,34 @@ export const encryptCsvFileWithProgress = async (
             const remainSec = Math.ceil(avgPerChunk * remainingChunks);
             const min = Math.floor(remainSec / 60);
             const sec = remainSec % 60;
-            estimatedTime.value = `${min} 分 ${sec} 秒`;
+            const estimatedTime = `${min} 分 ${sec} 秒`;
+
+            onProgress({ progress: Number(percent.toFixed(2)), estimatedTime });
+
+            if (response.data === '所有块上传并合并成功') {
+              if (onComplete) onComplete();
+              stopEncryptionAndUpload(true);
+            }
 
             nextExpectedChunk++;
           } catch (uploadError) {
             console.error(`上传第 ${nextExpectedChunk} 块出错:`, uploadError);
-            // 出错跳过该块继续上传后续，避免阻塞
-            nextExpectedChunk++;
+            if (onError) onError(uploadError);
+            stopEncryptionAndUpload();
+            return;
           }
         }
       } else if (type === 'done') {
-        progress.value = 100;
-        estimatedTime.value = '0 分 0 秒';
         console.log('文件加密完成');
-        // ElMessage.success('文件加密完成');
       }
     };
 
-    // 启动初始加密
+    worker.onerror = (err) => {
+      console.error('Worker error:', err);
+      if (onError) onError(err);
+      stopEncryptionAndUpload();
+    };
+
     worker.postMessage({
       type: 'encryptFile',
       payload: {
@@ -239,6 +257,7 @@ export const encryptCsvFileWithProgress = async (
     });
   } catch (error) {
     ElMessage.error(`加密过程失败: ${error.message}`);
+    if (onError) onError(error);
     throw error;
   }
 };
@@ -281,6 +300,7 @@ async function uploadEncryptedChunk(chunk, currentChunk, totalChunks, fileId, fi
       ElMessage.error("文件上传失败，" + response?.message);
       throw new Error(`分片 ${currentChunk} 上传失败: ${errorMsg}`);
     }
+    return response;
   } catch (error) {
     // 捕获网络错误或其他异常情况
     console.error(`上传分片 ${currentChunk + 1} 时发生错误:`, error);

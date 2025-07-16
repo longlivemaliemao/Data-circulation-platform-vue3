@@ -10,7 +10,7 @@ const isEncryptionRequired = (url) => {
 
 // 判断是否需要对请求体进行签名
 const isSignRequired = (url, method) => {
-  return method === 'POST' && !url.includes('/exchange-keys');
+  return method === 'POST' && !url.includes('/exchange-keys') && !url.includes('/upload-chunk');
 };
 
 const request = async (url, options = {}) => {
