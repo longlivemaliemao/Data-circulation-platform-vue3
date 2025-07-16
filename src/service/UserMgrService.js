@@ -43,6 +43,7 @@ export const updateUser = async (user) => {
     if (response.success) {
       ElMessage.success('更新用户信息成功');
       await fetchUser(); // 更新成功后重新加载用户列表
+      window.location.reload(); // 刷新当前页面
     } else {
       throw new Error(response.message); // 抛出错误信息
     }
@@ -51,7 +52,7 @@ export const updateUser = async (user) => {
     console.error('更新用户信息失败:', error);
     throw error;
   }
-  window.location.reload(); // 刷新当前页面
+
 };
 
 export default {

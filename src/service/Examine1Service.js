@@ -50,6 +50,7 @@ export const onSubmit = async (formData, id, username) => {
 
   if (response1.success) {
     messages.push({ type: 'success', message: '申请已更新' });
+    window.location.reload(); // 刷新页面
   } else {
     messages.push({ type: 'error', message: '申请更新失败' });
   }
@@ -57,7 +58,7 @@ export const onSubmit = async (formData, id, username) => {
   // 存入 sessionStorage
   sessionStorage.setItem('reloadMessages', JSON.stringify(messages));
 
-  window.location.reload(); // 刷新页面
+
 };
 
 
@@ -76,13 +77,14 @@ export const onReject = async (explanation, id) => {
     if (response && response.success) {
       console.log('拒绝操作成功:', response.data);
       // 可以在这里处理成功的逻辑，比如显示提示消息或刷新页面
+      window.location.reload(); // 刷新当前页面
     } else {
       console.error('拒绝操作失败:', response.message);
     }
   } catch (error) {
     console.error('请求发生错误:', error);
   }
-  window.location.reload(); // 刷新当前页面
+
 };
 
 
