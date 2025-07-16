@@ -84,12 +84,17 @@ export const onSubmit = async (formData, username) => {
   try {
     // 调用接口提交数据
     const response = await post('/application/add', applicationData);
-    ElMessage.success('申请提交成功');
+    if(response.success) {
+      ElMessage.success('申请提交成功');
+      window.location.reload(); // 刷新当前页面
+    } else {
+      ElMessage.error('申请提交失败,' + response.message);
+    }
   } catch (error) {
     console.error('Error:', error);
-    ElMessage.error('申请提交失败');
+    ElMessage.error('申请提交失败:' + error);
   }
-  window.location.reload(); // 刷新当前页面
+  
 }
 
 export const onSubmit1 = async (taskId, type, username) => {
@@ -116,6 +121,7 @@ export const onSubmit1 = async (taskId, type, username) => {
         const response = await post('/application/add', applicationData);
         if(response.success) {
           messages.push({ type: 'success', message: '申请提交成功' });
+          window.location.reload(); // 刷新当前页面
         } else {
           messages.push({ type: 'error', message: response.message });
         }
@@ -132,7 +138,6 @@ export const onSubmit1 = async (taskId, type, username) => {
     messages.push({ type: 'error', message: '申请提交失败' });
   }
   sessionStorage.setItem('reloadMessages', JSON.stringify(messages));
-  window.location.reload(); // 刷新当前页面
 }
 
 export const Download = async (row) => {
