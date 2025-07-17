@@ -141,40 +141,35 @@ export const onSubmit1 = async (taskId, type, username) => {
 }
 
 export const Download = async (row) => {
+  const { fileName, id: applicationId } = row;
   try {
-    const startTime = Date.now(); // 记录开始时间
-    // 发起请求下载文件
-    const response = await get(`/download?fileName=${row.fileName}&applicationId=${row.id}`, { responseType: 'blob' });
+    // 1. 先向后端申请带签名的下载令牌
+    const signResp = await get(`/getDownloadSign?fileName=${encodeURIComponent(fileName)}&applicationId=${applicationId}`);
 
-    // 创建一个 URL 对象
-    const url = window.URL.createObjectURL(response.data);
+    if (!signResp.success) {
+      ElMessage.error(signResp.message || '获取下载链接失败');
+      return;
+    }
 
-    // 创建下载链接
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', row.fileName + '.csv'); // 设置下载文件名
+    const signedToken = signResp.data; // 后端返回的 token 字符串
 
-    // 触发下载
-    document.body.appendChild(link);
-    link.click();
+    // 2. 无需携带 authToken，直接请求下载接口，并对 token 进行 URL 编码
+    const basePath = '/dataflow/api';
+    const downloadUrl = `${basePath}/download/${encodeURIComponent(signedToken)}`;
 
-    // 清理
-    link.remove();
-    window.URL.revokeObjectURL(url);
-
-    ElMessage.success('下载成功');
-    const duration = Date.now() - startTime; // 单位：毫秒
-
-    const minutes = Math.floor(duration / 60000);
-    const seconds = Math.floor((duration % 60000) / 1000);
-    const milliseconds = duration % 1000;
-
-    console.log(`耗时：${minutes} 分 ${seconds} 秒 ${milliseconds} 毫秒`);
+    // 直接触发浏览器的原生下载，让浏览器自己显示进度
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.setAttribute('download', fileName + '.csv');
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    ElMessage.success('下载开始，您可以在浏览器下载栏查看进度');
+    // 如需统计耗时，可在后端日志或浏览器下载完成事件中查看
   } catch (error) {
-    console.error('Error:', error);
+    console.error('下载错误:', error);
     ElMessage.error('下载失败');
   }
-
 };
 
 
