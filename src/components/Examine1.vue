@@ -338,7 +338,7 @@ const onEndPickerVisible = (visible) => {
                       <template #default="scope">
                         <div class="application-content">
                           <div>需求：{{ scope.row.text }}</div>
-                          <div>时间范围：{{ scope.row.startDate }} - {{ scope.row.endDate }}</div>
+                          <!-- <div>时间范围：{{ scope.row.startDate }} - {{ scope.row.endDate }}</div> -->
                         </div>
                       </template>
                     </el-table-column>
