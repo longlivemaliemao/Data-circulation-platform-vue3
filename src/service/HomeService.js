@@ -23,9 +23,11 @@ export const fetchDataRecord = async (queryParams = {}) => {
     }
 
     const response = await get(`/task/getCompletedData${queryString}`);
-    return response.data;
+    return response.data; // This returns MyPage<T> now
   } catch (error) {
     console.error('Error:', error);
+    // Return a default structure on error to prevent crashes in the component
+    return { result: [], total: 0 };
   }
 };
 

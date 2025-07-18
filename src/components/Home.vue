@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, reactive } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import {handleCommand, handleSelect} from '@/router.js'
 import { fetchDataRecord, searchUsernamesAPI, toSavePrivateKey } from '@/service/HomeService.js'
@@ -25,7 +25,8 @@ const { availableMenus } = useMenu(userRole);
 // 分页相关数据
 const tableData = ref([]);
 const currentPage = ref(1); // 当前页
-const pageSize = ref(7); // 每页显示条数
+const pageSize = ref(10); // 每页显示条数
+const totalRecords = ref(0); // 总记录数
 
 // 查询条件
 const query = reactive({
@@ -41,9 +42,7 @@ const Outline = ref('');
 
 // 计算分页后的数据
 const formattedTableData = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return tableData.value.slice(start, end).map(record => {
+  return tableData.value.map(record => {
     return {
       ...record,
       usageTimeFormatted: formatDate(record.time),
@@ -54,11 +53,21 @@ const formattedTableData = computed(() => {
 
 // 统一获取并设置数据的函数
 const fetchAndSetData = async (params = {}) => {
-  const rawData = await fetchDataRecord(params);
-  if (rawData && rawData.length > 0) {
-    rawData.sort((a, b) => new Date(b.time) - new Date(a.time));
+  const queryParams = {
+    ...params,
+    pageNum: currentPage.value,
+    pageSize: pageSize.value,
+  };
+  const response = await fetchDataRecord(queryParams); // response is MyPage<T>
+  if (response && response.result) {
+    response.result.sort((a, b) => new Date(b.time) - new Date(a.time));
+    tableData.value = response.result;
+    totalRecords.value = response.total;
+  } else {
+    // This case might happen if API call fails and service returns the default object
+    tableData.value = [];
+    totalRecords.value = 0;
   }
-  tableData.value = rawData || [];
 };
 
 onMounted(async () => {
@@ -232,8 +241,11 @@ const handleQuery = async () => {
     params.end = query.dateRange[1];
   }
 
-  await fetchAndSetData(params);
-  currentPage.value = 1;
+  if (currentPage.value !== 1) {
+    currentPage.value = 1;
+  } else {
+    await fetchAndSetData(getQueryParams());
+  }
 };
 
 // 重置查询条件
@@ -242,9 +254,38 @@ const handleReset = async () => {
   query.fileName = '';
   query.creatorName = '';
   query.dateRange = [];
-  await fetchAndSetData();
-  currentPage.value = 1;
+  if (currentPage.value !== 1) {
+    currentPage.value = 1;
+  } else {
+    await fetchAndSetData();
+  }
 };
+
+const handleSizeChange = async (newSize) => {
+  pageSize.value = newSize;
+  if (currentPage.value !== 1) {
+    currentPage.value = 1;
+  } else {
+    await fetchAndSetData(getQueryParams());
+  }
+};
+
+const getQueryParams = () => {
+  const params = {};
+  if (query.taskId) params.taskId = query.taskId;
+  if (query.fileName) params.fileName = query.fileName;
+  if (query.creatorName) params.creatorName = query.creatorName;
+  if (query.dateRange && query.dateRange.length === 2) {
+    params.begin = query.dateRange[0];
+    params.end = query.dateRange[1];
+  }
+  return params;
+};
+
+
+watch(currentPage, async () => {
+  await fetchAndSetData(getQueryParams());
+});
 
 </script>
 
@@ -403,10 +444,12 @@ const handleReset = async () => {
                 <div style="margin-top: 20px; overflow-x: auto;">  <!-- 新增容器 -->
                   <el-pagination
                       background
-                      layout="prev, pager, next"
-                      :total="tableData.length"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :total="totalRecords"
+                      :page-sizes="[10, 20, 30, 50]"
                       :page-size="pageSize"
-                      v-model:currentPage="currentPage"
+                      v-model:current-page="currentPage"
+                      @size-change="handleSizeChange"
                       class="pagination"
                       :small="isMobile"
                       :pager-count="isMobile ? 3 : 5"
