@@ -132,7 +132,8 @@ export const onSubmit1 = async (taskId, type, username) => {
       }
 
     }else{
-      messages.push({ type: 'error', message: '没有找到对应的任务ID,请重新输入ID' });
+      //messages.push({ type: 'error', message: '没有找到对应的任务ID,请重新输入ID' });
+      ElMessage.error('没有找到对应的任务ID,请重新输入ID');
     }
   } catch (error) {
     messages.push({ type: 'error', message: '申请提交失败' });
