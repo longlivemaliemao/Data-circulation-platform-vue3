@@ -159,12 +159,7 @@ export const Download = async (row) => {
     const downloadUrl = `${basePath}/download/${encodeURIComponent(signedToken)}`;
 
     // 直接触发浏览器的原生下载，让浏览器自己显示进度
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.setAttribute('download', fileName + '.csv');
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    window.location.href = downloadUrl;
     ElMessage.success('下载开始，您可以在浏览器下载栏查看进度');
     // 如需统计耗时，可在后端日志或浏览器下载完成事件中查看
   } catch (error) {
