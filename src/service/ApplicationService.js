@@ -145,7 +145,7 @@ export const Download = async (row) => {
   const { fileName, id: applicationId } = row;
   try {
     // 1. 先向后端申请带签名的下载令牌
-    const signResp = await get(`/getDownloadSign?fileName=${encodeURIComponent(fileName)}&applicationId=${applicationId}`);
+    const signResp = await get(`/getDownloadSign?applicationId=${applicationId}`);
 
     if (!signResp.success) {
       ElMessage.error(signResp.message || '获取下载链接失败');

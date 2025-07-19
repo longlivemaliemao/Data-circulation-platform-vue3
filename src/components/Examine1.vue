@@ -7,7 +7,7 @@ import {
   addMember,
   fetchApplications,
   encryptCsvFileWithProgress,
-  fetchFiles, onReject,
+  fetchFiles, onReject, stopEncryptionAndUpload, userStopUpload,
 } from '@/service/Examine1Service.js'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { useMenu } from '@/service/useMenu.js'
@@ -157,8 +157,8 @@ const encryptAndUpload = async () => {
   );
 };
 
-const stopUpload = () => {
-  stopEncryptionAndUpload();
+const stopUpload = async () => {
+  await userStopUpload(fileName.value); // 调用新的 service 函数
   isProcessing.value = false;
 };
 

@@ -6,14 +6,16 @@ import { getSharedKey } from '@/utils/cryptoUtils.js';
 import { encryptFile } from '@/service/cryptoWorkerService.js';
 
 let worker = null;
+let isCancelled = false;
 
 export function stopEncryptionAndUpload(silent = false) {
+  isCancelled = true;
   if (worker) {
     worker.terminate();
     worker = null;
-    if (!silent) {
-      ElMessage.info('上传已停止');
-    }
+  }
+  if (!silent) {
+    ElMessage.info('上传已停止');
   }
 }
 
@@ -179,6 +181,7 @@ export const encryptCsvFileWithProgress = async (
   creator_name,
   fileOutline
 ) => {
+  isCancelled = false; // Reset cancellation flag for new uploads
   if (worker) {
     worker.terminate();
   }
@@ -193,12 +196,17 @@ export const encryptCsvFileWithProgress = async (
     let nextExpectedChunk = 0;
 
     worker.onmessage = async (e) => {
+      if (isCancelled) return;
       const { type, chunkWithLength, currentChunk, totalChunks } = e.data;
 
       if (type === 'encryptedChunk') {
         uploadQueue.set(currentChunk, { chunkWithLength });
 
         while (uploadQueue.has(nextExpectedChunk)) {
+          if (isCancelled) {
+            uploadQueue.clear();
+            return;
+          }
           const { chunkWithLength: chunk } = uploadQueue.get(nextExpectedChunk);
           uploadQueue.delete(nextExpectedChunk);
 
@@ -212,6 +220,7 @@ export const encryptCsvFileWithProgress = async (
               creator_name,
               fileOutline
             );
+            if (isCancelled) return;
 
             const percent = ((nextExpectedChunk + 1) / totalChunks) * 100;
             const now = Date.now();
@@ -232,6 +241,7 @@ export const encryptCsvFileWithProgress = async (
 
             nextExpectedChunk++;
           } catch (uploadError) {
+            if (isCancelled) return;
             console.error(`上传第 ${nextExpectedChunk} 块出错:`, uploadError);
             if (onError) onError(uploadError);
             stopEncryptionAndUpload();
@@ -261,6 +271,30 @@ export const encryptCsvFileWithProgress = async (
     ElMessage.error(`加密过程失败: ${error.message}`);
     if (onError) onError(error);
     throw error;
+  }
+};
+export const userStopUpload = async (fileName) => {
+  isCancelled = true;
+  if (worker) {
+    worker.terminate();
+    worker = null;
+  }
+
+  if (!fileName) {
+    ElMessage.info('客户端上传已停止，但未提供文件名以通知后端。');
+    return;
+  }
+
+  try {
+    const response = await get(`/stopUpload?fileName=${encodeURIComponent(fileName)}`);
+    if (response.success) {
+      ElMessage.success(response.data || '文件上传已停止');
+    } else {
+      ElMessage.error(`'出错: '${response.message}`);
+    }
+  } catch (error) {
+    console.error('请求停止上传失败:', error);
+    ElMessage.error('出错: ', error);
   }
 };
 
