@@ -194,3 +194,20 @@ export const validateResetCode = async (forgetData) => {
     throw new Error(error.response?.data?.message || '');
   }
 };
+
+// 处理用户登出请求的函数
+export async function onLogout() {
+  try {
+    // 调用后端的登出接口
+    const response = await post('/logout');
+    if (response.success) {
+      ElMessage.success('登出成功');
+    } else {
+      // 即便后端登出失败，前端也继续执行登出流程
+      ElMessage.warning(response.message || '后端登出失败，但前端将继续登出');
+    }
+  } catch (error) {
+    console.error('调用登出接口时发生错误:', error);
+    ElMessage.error('无法连接到服务器，但将继续本地登出');
+  }
+}

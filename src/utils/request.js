@@ -104,11 +104,19 @@ const request = async (url, options = {}) => {
       };
     }
 
-    if (typeof response.json !== 'function') {
-      throw new Error('response.json 不是函数，response对象可能异常');
+    const responseText = await response.text();
+    let apiResponse;
+    try {
+      apiResponse = JSON.parse(responseText);
+    } catch (e) {
+      // 如果 JSON 解析失败，检查是否是登出请求
+      if (url.includes('/logout')) {
+        // 登出请求收到非 JSON 响应（可能是 HTML），我们将其视为成功
+        return { success: true, message: 'Logout successful.' };
+      }
+      // 如果是其他请求，则抛出原始错误
+      throw new Error(`Failed to parse JSON response: ${responseText}`);
     }
-
-    const apiResponse = await response.json();
 
     const currentSharedKey = await getSharedKey();
     const decryptedData = isEncryptionRequired(url) && apiResponse.encryptedData

@@ -1,4 +1,6 @@
+import { onLogout } from '@/service/AuthService.js';
 import { createRouter, createWebHistory } from 'vue-router'
+import {clearSharedKey} from '@/utils/cryptoUtils'
 import Home from './components/Home.vue'
 // import ApprovalProcess from './components/ApplicationsProcess.vue'
 import Application from '@/components/Application.vue'
@@ -116,15 +118,25 @@ export const handleSelect = (index) => {
   }
 };
 
+// 清除特定的 cookie
+const clearCookie = (name) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
 //点击登出并跳转到登录界面
-export const handleCommand = (command) => {
+export const handleCommand = async (command) => {
   if (command === 'logout') {
+    await onLogout(); // 调用后端的登出接口
     // 清理登录状态，例如移除 token 或用户信息
     sessionStorage.clear();
     localStorage.clear();
-    // 然后跳转到登录页面
-    router.push('/');
-    window.location.reload(); // 刷新页面
+    clearSharedKey();
+    clearCookie('JSESSIONID'); // 尝试清除 JSESSIONID cookie
+    // 延迟一段时间以便用户可以看到提示信息
+    setTimeout(() => {
+      router.push('/');
+      window.location.reload(); // 刷新页面
+    }, 750); // 延迟
   }
 };
 
