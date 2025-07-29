@@ -68,6 +68,16 @@ const onReset = () => {
   formData.value.dateTimeRange = null;
 };
 
+const statusText = (status) => {
+  const statusMap = {
+    'in_progress': '进行中',
+    'completed': '已完成',
+    'failed': '失败',
+    'invalid_private_key': '私钥无效，请重新提交'
+  };
+  return statusMap[status] || status;
+};
+
 const isCollapse = ref(false); // 侧边栏折叠状态
 const isMobile = ref(false); // 是否移动设备
 const asideWidth = ref('240px'); // 动态侧边栏宽度
@@ -173,7 +183,11 @@ const handleResize = () => {
                     <el-table-column prop="taskId" label="任务ID" align="center" />
                     <el-table-column prop="fileName" label="数据名" align="center" />
                     <el-table-column prop="taskType" label="类型" align="center" />
-                    <el-table-column prop="status" label="状态" align="center" />
+                    <el-table-column prop="status" label="状态" align="center">
+                      <template #default="scope">
+                        <span>{{ statusText(scope.row.status) }}</span>
+                      </template>
+                    </el-table-column>
                     <el-table-column label="操作" align="center" width="100">
                       <template #default="scope">
                         <!-- 文件选择 -->
